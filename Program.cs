@@ -25,13 +25,6 @@ namespace nethereumapp
 
     }
 
-    static async Task GetBlockNumber()
-    {
-      var web3 = new Web3("https://eth-mainnet.g.alchemy.com/v2/CDW6UVk07GwZbMLFX_SyLO415DmR9hco");
-      var latestBlockNumber = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
-      Console.WriteLine($"Latest Block Number is: {latestBlockNumber}");
-    }
-
     static async Task GetBlockByNumber()
     {
       var web3 = new Web3("https://eth-mainnet.g.alchemy.com/v2/CDW6UVk07GwZbMLFX_SyLO415DmR9hco");
@@ -54,6 +47,13 @@ namespace nethereumapp
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
           Console.WriteLine("Txn Count: " + txCount);
       }
+    }
+
+    static async Task GetBlockNumber()
+    {
+      var web3 = new Web3("https://eth-mainnet.g.alchemy.com/v2/CDW6UVk07GwZbMLFX_SyLO415DmR9hco");
+      var latestBlockNumber = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+      Console.WriteLine($"Latest Block Number is: {latestBlockNumber}");
     }
 
     static async Task getTxnCountByNumber() {
