@@ -6,6 +6,7 @@ using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.RPC.Eth.DTOs;
 using System.Numerics;
 using System.Threading;
+using MySql.Data.MySqlClient;
 
 namespace nethereumapp
 {
@@ -18,6 +19,28 @@ namespace nethereumapp
       GetBlockByNumber().Wait();
       //getTxnCountByNumber().Wait();
       //GetBlockCount().Wait();
+      
+      databaseprog dbp = new databaseprog();
+      dbp.CreateTable();
+      //mysql 
+      /*string cs = @"server=localhost;userid=sammy;password=password;database=etherdb";
+      using var con = new MySqlConnection(cs);
+      con.Open();
+      Console.WriteLine($"MySQL version : {con.ServerVersion}");
+      using var cmd = new MySqlCommand();
+      cmd.Connection = con;
+      cmd.CommandText = "DROP TABLE IF EXISTS blocks";
+      cmd.ExecuteNonQuery();
+      cmd.CommandText = @"CREATE TABLE `blocks`(
+        blockId INTEGER PRIMARY KEY AUTO_INCREMENT,
+        blockNumber INT(20), 
+        hash VARCHAR(66),
+        parentHash VARCHAR(66),
+        miner VARCHAR(42),
+        blockReward DECIMAL(50,0),
+        gasLimit DECIMAL(50,0),
+        gasUsed DECIMAL(50,0)";
+      cmd.ExecuteNonQuery();*/
     }
 
     static async Task GetBlockNumber()
@@ -77,6 +100,57 @@ namespace nethereumapp
       startAtBlockNumberIfNotProcessed: new BigInteger(1));
 
       Console.WriteLine($"Block Count {context.Blocks.Count}");
+    }
+  }
+
+  public class databaseprog {
+    public databaseprog() {
+      string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
+      MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
+
+      using var con = new MySqlConnection(cs);
+      con.Open();
+      Console.WriteLine($"MySQL version : {con.ServerVersion}");
+
+      MySqlCommand cmd;
+      string s0;
+
+      try
+      {
+        dbConn.Open();
+        s0 = "CREATE DATABASE IF NOT EXISTS `etherdb`;";
+        cmd = new MySqlCommand(s0, dbConn);
+        cmd.ExecuteNonQuery();
+        dbConn.Close();
+      }
+      catch
+      {
+        Console.WriteLine("constructor Error happens");
+      }
+    }
+
+    public void CreateTable()
+    {
+      string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
+      MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
+      MySqlCommand cmd;
+      string s0;
+
+      try
+      {
+        dbConn.Open();
+        s0 = "DROP TABLE IF EXISTS blocks";
+        cmd = new MySqlCommand(s0, dbConn);
+        cmd.ExecuteNonQuery();
+        s0 = "CREATE TABLE `blocks` (`blockId` INT AUTO_INCREMENT, `blockNumber` INT(20), `hash` VARCHAR(66), `parentHash` VARCHAR(66), parentHash VARCHAR(66),`miner` VARCHAR(42),`blockReward` DECIMAL(50,0),`gasLimit` DECIMAL(50,0),`gasUsed` DECIMAL(50,0), PRIMARY KEY(`blockId`));";
+        cmd.ExecuteNonQuery();
+        dbConn.Close();
+        Console.WriteLine("Table created");
+      }
+      catch
+      {
+        Console.WriteLine("CreateTable Error happens");
+      }
     }
   }
 }
