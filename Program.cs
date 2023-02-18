@@ -15,32 +15,14 @@ namespace nethereumapp
 
     static void Main(string[] args)
     {
-      //GetBlockNumber().Wait();
       GetBlockByNumber().Wait();
+      //GetBlockNumber().Wait();
       //getTxnCountByNumber().Wait();
       //GetBlockCount().Wait();
       
       databaseprog dbp = new databaseprog();
       dbp.CreateTable();
-      //mysql 
-      /*string cs = @"server=localhost;userid=sammy;password=password;database=etherdb";
-      using var con = new MySqlConnection(cs);
-      con.Open();
-      Console.WriteLine($"MySQL version : {con.ServerVersion}");
-      using var cmd = new MySqlCommand();
-      cmd.Connection = con;
-      cmd.CommandText = "DROP TABLE IF EXISTS blocks";
-      cmd.ExecuteNonQuery();
-      cmd.CommandText = @"CREATE TABLE `blocks`(
-        blockId INTEGER PRIMARY KEY AUTO_INCREMENT,
-        blockNumber INT(20), 
-        hash VARCHAR(66),
-        parentHash VARCHAR(66),
-        miner VARCHAR(42),
-        blockReward DECIMAL(50,0),
-        gasLimit DECIMAL(50,0),
-        gasUsed DECIMAL(50,0)";
-      cmd.ExecuteNonQuery();*/
+
     }
 
     static async Task GetBlockNumber()
