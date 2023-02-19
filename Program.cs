@@ -121,18 +121,23 @@ namespace nethereumapp
       try
       {
         dbConn.Open();
-        s0 = "DROP TABLE IF EXISTS blocks";
-        cmd = new MySqlCommand(s0, dbConn);
-        cmd.ExecuteNonQuery();
-        s0 = "CREATE TABLE `blocks` (`blockId` INT AUTO_INCREMENT, `blockNumber` INT(20), `hash` VARCHAR(66), `parentHash` VARCHAR(66), parentHash VARCHAR(66),`miner` VARCHAR(42),`blockReward` DECIMAL(50,0),`gasLimit` DECIMAL(50,0),`gasUsed` DECIMAL(50,0), PRIMARY KEY(`blockId`));";
-        cmd.ExecuteNonQuery();
 
         s0 = "DROP TABLE IF EXISTS transactions";
         cmd = new MySqlCommand(s0, dbConn);
         cmd.ExecuteNonQuery();
 
-        s0 = "CREATE TABLE `transactions` (`transactionID` INT AUTO_INCREMENT, `hash` VARCHAR(66), `from` VARCHAR(42), `to` VARCHAR(42), `value` DECIMAL(50,0),`gas` DECIMAL(50,0),`gasPrice` DECIMAL(50,0), `transactionIndex` INT(20), PRIMARY KEY(`blockId`));";
+        s0 = "DROP TABLE IF EXISTS blocks";
+        cmd = new MySqlCommand(s0, dbConn);
         cmd.ExecuteNonQuery();
+
+        s0 = "CREATE TABLE `blocks` (`blockId` INT AUTO_INCREMENT, `blockNumber` INT(20), `hash` VARCHAR(66), parentHash VARCHAR(66),`miner` VARCHAR(42),`blockReward` DECIMAL(50,0),`gasLimit` DECIMAL(50,0),`gasUsed` DECIMAL(50,0), PRIMARY KEY(`blockId`));";
+        cmd = new MySqlCommand(s0, dbConn);
+        cmd.ExecuteNonQuery();
+
+        s0 = "CREATE TABLE `transactions` (`transactionID` INT AUTO_INCREMENT, `hash` VARCHAR(66), `from` VARCHAR(42), `to` VARCHAR(42), `value` DECIMAL(50,0),`gas` DECIMAL(50,0),`gasPrice` DECIMAL(50,0), `transactionIndex` INT(20), `blockId` INT, PRIMARY KEY(`transactionID`), FOREIGN KEY (`blockId`) REFERENCES `blocks`(`blockId`));";
+        cmd = new MySqlCommand(s0, dbConn);
+        cmd.ExecuteNonQuery();
+
         dbConn.Close();
         Console.WriteLine("Table created");
       }
