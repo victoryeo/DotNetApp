@@ -8,25 +8,22 @@ using System.Numerics;
 using System.Threading;
 using MySql.Data.MySqlClient;
 
-namespace nethereumapp
-{
-  class Program
-  {
+namespace nethereumapp {
+  class Program {
 
-    static void Main(string[] args)
-    {
-      GetBlockByNumber().Wait();
+    static void Main(string[] args) {
+      //GetBlockByNumber().Wait();
       //GetBlockNumber().Wait();
       //getTxnCountByNumber().Wait();
       //GetBlockCount().Wait();
       
       databaseprog dbp = new databaseprog();
       dbp.CreateTable();
+      dbp.ReadData();
 
     }
 
-    static async Task GetBlockByNumber()
-    {
+    static async Task GetBlockByNumber() {
       var web3 = new Web3("https://eth-mainnet.g.alchemy.com/v2/CDW6UVk07GwZbMLFX_SyLO415DmR9hco");
 
       HexBigInteger hexBigInt = new HexBigInteger(0xB8A1A1);
@@ -49,8 +46,7 @@ namespace nethereumapp
       }
     }
 
-    static async Task GetBlockNumber()
-    {
+    static async Task GetBlockNumber() {
       var web3 = new Web3("https://eth-mainnet.g.alchemy.com/v2/CDW6UVk07GwZbMLFX_SyLO415DmR9hco");
       var latestBlockNumber = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
       Console.WriteLine($"Latest Block Number is: {latestBlockNumber}");
@@ -97,29 +93,25 @@ namespace nethereumapp
       MySqlCommand cmd;
       string s0;
 
-      try
-      {
+      try {
         dbConn.Open();
         s0 = "CREATE DATABASE IF NOT EXISTS `etherdb`;";
         cmd = new MySqlCommand(s0, dbConn);
         cmd.ExecuteNonQuery();
         dbConn.Close();
       }
-      catch
-      {
-        Console.WriteLine("constructor Error happens");
+      catch {
+        Console.WriteLine("Constructor error");
       }
     }
 
-    public void CreateTable()
-    {
+    public void CreateTable() {
       string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
       MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
       MySqlCommand cmd;
       string s0;
 
-      try
-      {
+      try {
         dbConn.Open();
 
         s0 = "DROP TABLE IF EXISTS transactions";
@@ -141,9 +133,24 @@ namespace nethereumapp
         dbConn.Close();
         Console.WriteLine("Table created");
       }
-      catch
-      {
-        Console.WriteLine("CreateTable Error happens");
+      catch {
+        Console.WriteLine("CreateTable error");
+      }
+    }
+
+    public void ReadData() {
+      string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
+      MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
+      MySqlCommand cmd;
+      string s0;
+
+      try {
+        dbConn.Open();
+        dbConn.Close();
+        Console.WriteLine("Data is read");
+      }
+      catch {
+        Console.WriteLine("ReadData error");
       }
     }
   }
