@@ -69,9 +69,16 @@ namespace nethereumapp {
             + "   input           : " + e.Input
             );
     
-            s0 = "INSERT INTO transactions (blockID, hash, fromAr, toAr, valueAr, gas, gasPrice, transactionIndex) VALUES (@blockID, '34E334', 'A478fA', '4006eD', 10, 100, 20, 30);";
+            s0 = "INSERT INTO transactions (blockID, hash, fromAr, toAr, valueAr, gas, gasPrice, transactionIndex) VALUES (@blockID, @hash, @fromAr, @toAr, @valueAr, @gas, @gasPrice, @transactionIndex);";
             cmd = new MySqlCommand(s0, dbConn);
             cmd.Parameters.AddWithValue("@blockID", blockID);
+            cmd.Parameters.AddWithValue("@hash", e.TransactionHash);
+            cmd.Parameters.AddWithValue("@fromAr", e.From);
+            cmd.Parameters.AddWithValue("@toAr", e.To);
+            cmd.Parameters.AddWithValue("@valueAr", e.Value);
+            cmd.Parameters.AddWithValue("@gas", e.Gas.Value);
+            cmd.Parameters.AddWithValue("@gasPrice", Web3.Convert.FromWei(e.GasPrice.Value));
+            cmd.Parameters.AddWithValue("@transactionIndex", e.TransactionIndex);
             cmd.ExecuteNonQuery();
           }
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
