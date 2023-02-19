@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Nethereum.Web3;
 using Nethereum.Hex.HexTypes;
@@ -42,6 +43,9 @@ namespace nethereumapp {
         if (block != null) {
           string[] linesArray = new string[1000];
           int i = 0;
+          DateTime timeStamp1 = (DateTime.Now);
+          Console.WriteLine("Begin timestamp: " + timeStamp1);
+          var watch = System.Diagnostics.Stopwatch.StartNew();
           // write block info to db
           s0 = "INSERT INTO blocks (blockNumber, hash, parentHash, miner, blockReward, gasLimit, gasUsed) VALUES (@blockNumber, @hash, @parentHash, @miner, 5, @gasLimit, @gasUsed);";
           cmd = new MySqlCommand(s0, dbConn);
@@ -85,6 +89,11 @@ namespace nethereumapp {
 
             linesArray[i++] = lines;
           }
+          DateTime timeStamp2 = (DateTime.Now);
+          Console.WriteLine("End timestamp: " + timeStamp2);
+          watch.Stop();
+          var elapsedMs = watch.ElapsedMilliseconds;
+          Console.WriteLine("Elapsed time: " + elapsedMs);
           await File.WriteAllLinesAsync("EtherOutputs.txt", linesArray);
 
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
