@@ -44,7 +44,7 @@ namespace nethereumapp {
           string[] linesArray = new string[1000];
           int i = 0;
           DateTime timeStamp1 = (DateTime.Now);
-          Console.WriteLine("Begin timestamp: " + timeStamp1);
+          Console.WriteLine("Begin time: " + timeStamp1);
           var watch = System.Diagnostics.Stopwatch.StartNew();
           // write block info to db
           s0 = "INSERT INTO blocks (blockNumber, hash, parentHash, miner, blockReward, gasLimit, gasUsed) VALUES (@blockNumber, @hash, @parentHash, @miner, 5, @gasLimit, @gasUsed);";
@@ -90,12 +90,17 @@ namespace nethereumapp {
             linesArray[i++] = lines;
           }
           DateTime timeStamp2 = (DateTime.Now);
-          Console.WriteLine("End timestamp: " + timeStamp2);
+          Console.WriteLine("End time: " + timeStamp2);
           watch.Stop();
           var elapsedMs = watch.ElapsedMilliseconds;
           Console.WriteLine("Elapsed time: " + elapsedMs);
           await File.WriteAllLinesAsync("EtherOutputs.txt", linesArray);
-
+          File.AppendAllText("EtherOutputs.txt", 
+            "Start time: " + timeStamp1 + Environment.NewLine);
+          File.AppendAllText("EtherOutputs.txt", 
+            "End time: " + timeStamp2 + Environment.NewLine);
+          File.AppendAllText("EtherOutputs.txt", 
+            "Elapsed time: " + elapsedMs + Environment.NewLine);
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
           Console.WriteLine("Txn Count: " + txCount);
         }
