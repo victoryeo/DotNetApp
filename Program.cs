@@ -40,6 +40,8 @@ namespace nethereumapp {
 
         Console.WriteLine("Blocks: " + block);
         if (block != null) {
+          string[] linesArray = new string[1000];
+          int i = 0;
           // write block info to db
           s0 = "INSERT INTO blocks (blockNumber, hash, parentHash, miner, blockReward, gasLimit, gasUsed) VALUES (@blockNumber, @hash, @parentHash, @miner, 5, @gasLimit, @gasUsed);";
           cmd = new MySqlCommand(s0, dbConn);
@@ -54,7 +56,7 @@ namespace nethereumapp {
           Console.WriteLine("blockID: " + blockID);
 
           foreach (Nethereum.RPC.Eth.DTOs.Transaction e in block.Transactions) {
-            Console.WriteLine(
+            string lines = (
               "  tx hash          : " + e.TransactionHash + "\n"
             + "   nonce           : " + e.Nonce.Value + "\n"
             + "   blockHash       : " + e.BlockHash + "\n"
@@ -68,7 +70,7 @@ namespace nethereumapp {
             + "   gas             : " + e.Gas.Value + "\n"
             + "   input           : " + e.Input
             );
-    
+
             s0 = "INSERT INTO transactions (blockID, hash, fromAr, toAr, valueAr, gas, gasPrice, transactionIndex) VALUES (@blockID, @hash, @fromAr, @toAr, @valueAr, @gas, @gasPrice, @transactionIndex);";
             cmd = new MySqlCommand(s0, dbConn);
             cmd.Parameters.AddWithValue("@blockID", blockID);
@@ -80,7 +82,11 @@ namespace nethereumapp {
             cmd.Parameters.AddWithValue("@gasPrice", Web3.Convert.FromWei(e.GasPrice.Value));
             cmd.Parameters.AddWithValue("@transactionIndex", e.TransactionIndex);
             cmd.ExecuteNonQuery();
+
+            linesArray[i++] = lines;
           }
+          await File.WriteAllLinesAsync("EtherOutputs.txt", linesArray);
+
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
           Console.WriteLine("Txn Count: " + txCount);
         }
