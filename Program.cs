@@ -50,6 +50,8 @@ namespace nethereumapp {
           cmd.Parameters.AddWithValue("@gasLimit", block.GasLimit);
           cmd.Parameters.AddWithValue("@gasUsed", block.GasUsed);
           cmd.ExecuteNonQuery();
+          long blockID = cmd.LastInsertedId;
+          Console.WriteLine("blockID: " + blockID);
 
           foreach (Nethereum.RPC.Eth.DTOs.Transaction e in block.Transactions) {
             Console.WriteLine(
@@ -66,8 +68,11 @@ namespace nethereumapp {
             + "   gas             : " + e.Gas.Value + "\n"
             + "   input           : " + e.Input
             );
-          
-          
+    
+            s0 = "INSERT INTO transactions (blockID, hash, fromAr, toAr, valueAr, gas, gasPrice, transactionIndex) VALUES (@blockID, '34E334', 'A478fA', '4006eD', 10, 100, 20, 30);";
+            cmd = new MySqlCommand(s0, dbConn);
+            cmd.Parameters.AddWithValue("@blockID", blockID);
+            cmd.ExecuteNonQuery();
           }
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
           Console.WriteLine("Txn Count: " + txCount);
@@ -157,11 +162,11 @@ namespace nethereumapp {
         cmd = new MySqlCommand(s0, dbConn);
         cmd.ExecuteNonQuery();
 
-        s0 = "CREATE TABLE `blocks` (`blockId` INT AUTO_INCREMENT, `blockNumber` INT(20), `hash` VARCHAR(66), parentHash VARCHAR(66),`miner` VARCHAR(42),`blockReward` DECIMAL(50,0),`gasLimit` DECIMAL(50,0),`gasUsed` DECIMAL(50,0), PRIMARY KEY(`blockId`));";
+        s0 = "CREATE TABLE `blocks` (`blockID` INT(20) AUTO_INCREMENT, `blockNumber` INT(20), `hash` VARCHAR(66), parentHash VARCHAR(66),`miner` VARCHAR(42),`blockReward` DECIMAL(50,0),`gasLimit` DECIMAL(50,0),`gasUsed` DECIMAL(50,0), PRIMARY KEY(`blockID`));";
         cmd = new MySqlCommand(s0, dbConn);
         cmd.ExecuteNonQuery();
 
-        s0 = "CREATE TABLE `transactions` (`transactionID` INT AUTO_INCREMENT, `hash` VARCHAR(66), `from` VARCHAR(42), `to` VARCHAR(42), `value` DECIMAL(50,0),`gas` DECIMAL(50,0),`gasPrice` DECIMAL(50,0), `transactionIndex` INT(20), `blockId` INT, PRIMARY KEY(`transactionID`), FOREIGN KEY (`blockId`) REFERENCES `blocks`(`blockId`));";
+        s0 = "CREATE TABLE `transactions` (`transactionID` INT(20) AUTO_INCREMENT, `blockID` INT(20), `hash` VARCHAR(66), `fromAr` VARCHAR(42), `toAr` VARCHAR(42), `valueAr` DECIMAL(50,0),`gas` DECIMAL(50,0),`gasPrice` DECIMAL(50,0), `transactionIndex` INT(20), PRIMARY KEY(`transactionID`), FOREIGN KEY (`blockID`) REFERENCES `blocks`(`blockID`));";
         cmd = new MySqlCommand(s0, dbConn);
         cmd.ExecuteNonQuery();
 
