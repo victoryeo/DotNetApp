@@ -16,7 +16,6 @@ namespace nethereumapp {
 
       databaseprog dbp = new databaseprog();
       dbp.CreateTable();
-      dbp.ReadWriteData();
 
       GetBlockByNumber().Wait();
       //GetBlockNumber().Wait();
@@ -205,7 +204,7 @@ namespace nethereumapp {
       }
     }
 
-    public void ReadWriteData() {
+    public void WriteDataEx() {
       string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
       MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
       MySqlCommand cmd;
@@ -219,10 +218,10 @@ namespace nethereumapp {
         cmd.ExecuteNonQuery();
 
         dbConn.Close();
-        Console.WriteLine("Data is read write");
+        Console.WriteLine("Data is written");
       }
       catch {
-        Console.WriteLine("ReadWriteData error");
+        Console.WriteLine("WriteDataEx error");
       }
     }
   }
