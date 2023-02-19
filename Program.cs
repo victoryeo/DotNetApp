@@ -42,7 +42,8 @@ namespace nethereumapp {
         if (block != null) {
           string[] linesArray = new string[1000];
           int i = 0;
-          DateTime timeStamp1 = (DateTime.Now);
+          // timestamp
+          var timeStamp1 = DateTime.Now.ToFileTime();
           Console.WriteLine("Begin time: " + timeStamp1);
           var watch = System.Diagnostics.Stopwatch.StartNew();
           // write block info to db
@@ -74,6 +75,7 @@ namespace nethereumapp {
             + "   input           : " + e.Input
             );
 
+            // write transaction info into db
             s0 = "INSERT INTO transactions (blockID, hash, fromAr, toAr, valueAr, gas, gasPrice, transactionIndex) VALUES (@blockID, @hash, @fromAr, @toAr, @valueAr, @gas, @gasPrice, @transactionIndex);";
             cmd = new MySqlCommand(s0, dbConn);
             cmd.Parameters.AddWithValue("@blockID", blockID);
@@ -88,7 +90,8 @@ namespace nethereumapp {
 
             linesArray[i++] = lines;
           }
-          DateTime timeStamp2 = (DateTime.Now);
+          // timestamp
+          var timeStamp2 = DateTime.Now.ToFileTime();
           Console.WriteLine("End time: " + timeStamp2);
           watch.Stop();
           var elapsedMs = watch.ElapsedMilliseconds;
@@ -100,6 +103,7 @@ namespace nethereumapp {
             "End time: " + timeStamp2 + Environment.NewLine);
           File.AppendAllText("EtherOutputs.txt", 
             "Elapsed time: " + elapsedMs + Environment.NewLine);
+
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
           Console.WriteLine("Txn Count: " + txCount);
         }
