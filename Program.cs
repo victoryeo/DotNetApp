@@ -12,37 +12,72 @@ namespace nethereumapp {
   class Program {
 
     static void Main(string[] args) {
-      //GetBlockByNumber().Wait();
+
+      databaseprog dbp = new databaseprog();
+      dbp.CreateTable();
+      dbp.ReadWriteData();
+
+      GetBlockByNumber().Wait();
       //GetBlockNumber().Wait();
       //getTxnCountByNumber().Wait();
       //GetBlockCount().Wait();
       
-      databaseprog dbp = new databaseprog();
-      dbp.CreateTable();
-      dbp.ReadData();
-
     }
 
     static async Task GetBlockByNumber() {
+      
+      string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
+      MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
+      MySqlCommand cmd;
+      string s0;
+      dbConn.Open();
+
       var web3 = new Web3("https://eth-mainnet.g.alchemy.com/v2/CDW6UVk07GwZbMLFX_SyLO415DmR9hco");
 
-      HexBigInteger hexBigInt = new HexBigInteger(0xB8A1A1);
-      var block = await web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(hexBigInt);
+      try {
+        HexBigInteger hexBigInt = new HexBigInteger(0xB8A1A1);
+        var block = await web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(hexBigInt);
 
-      Console.WriteLine("Blocks: " + block);
-      if (block != null) {
+        Console.WriteLine("Blocks: " + block);
+        if (block != null) {
+          // write block info to db
+          s0 = "INSERT INTO blocks (blockNumber, hash, parentHash, miner, blockReward, gasLimit, gasUsed) VALUES (@blockNumber, @hash, @parentHash, @miner, 5, @gasLimit, @gasUsed);";
+          cmd = new MySqlCommand(s0, dbConn);
+          cmd.Parameters.AddWithValue("@blockNumber", block.Number);
+          cmd.Parameters.AddWithValue("@hash", block.BlockHash);
+          cmd.Parameters.AddWithValue("@parentHash", block.ParentHash);
+          cmd.Parameters.AddWithValue("@miner", block.Miner);
+          cmd.Parameters.AddWithValue("@gasLimit", block.GasLimit);
+          cmd.Parameters.AddWithValue("@gasUsed", block.GasUsed);
+          cmd.ExecuteNonQuery();
+
           foreach (Nethereum.RPC.Eth.DTOs.Transaction e in block.Transactions) {
             Console.WriteLine(
               "  tx hash          : " + e.TransactionHash + "\n"
             + "   nonce           : " + e.Nonce.Value + "\n"
             + "   blockHash       : " + e.BlockHash + "\n"
+            + "   blockNumber     : " + e.BlockNumber.Value + "\n"
+            + "   transactionIndex: " + e.TransactionIndex.Value + "\n"
             + "   from            : " + e.From + "\n"
             + "   to              : " + e.To + "\n"
-            + "   blockNumber     : " + e.BlockNumber.Value + "\n"
+            + "   value           : " + Web3.Convert.FromWei(e.Value.Value) + "\n"
+            + "   time            : " + block.Timestamp.Value + "\n"
+            + "   gasPrice        : " + Web3.Convert.FromWei(e.GasPrice.Value) + "\n"
+            + "   gas             : " + e.Gas.Value + "\n"
+            + "   input           : " + e.Input
             );
+          
+          
           }
           var txCount = await web3.Eth.Blocks.GetBlockTransactionCountByNumber.SendRequestAsync(hexBigInt);
           Console.WriteLine("Txn Count: " + txCount);
+        }
+
+        dbConn.Close();
+        Console.WriteLine("Data is written");
+      }
+      catch {
+        Console.WriteLine("Data write error");
       }
     }
 
@@ -138,7 +173,7 @@ namespace nethereumapp {
       }
     }
 
-    public void ReadData() {
+    public void ReadWriteData() {
       string cs = "server=localhost;database=etherdb;uid=sammy;password=password";
       MySql.Data.MySqlClient.MySqlConnection dbConn = new MySql.Data.MySqlClient.MySqlConnection(cs);
       MySqlCommand cmd;
@@ -146,11 +181,16 @@ namespace nethereumapp {
 
       try {
         dbConn.Open();
+
+        s0 = "INSERT INTO blocks (blockNumber, hash, parentHash, miner, blockReward, gasLimit, gasUsed) VALUES (11, '34E334', 'A478fA', '4006eD', 5, 100, 20);";
+        cmd = new MySqlCommand(s0, dbConn);
+        cmd.ExecuteNonQuery();
+
         dbConn.Close();
-        Console.WriteLine("Data is read");
+        Console.WriteLine("Data is read write");
       }
       catch {
-        Console.WriteLine("ReadData error");
+        Console.WriteLine("ReadWriteData error");
       }
     }
   }
